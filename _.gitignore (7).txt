@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies (only relevant if you add tooling later)
+node_modules/
+
+# Logs
+npm-debug.log*

@@ -1,0 +1,11 @@
+{
+  "name": "binstock",
+  "version": "1.0.0",
+  "description": "A component inventory console for searching, filtering, and sorting live warehouse stock.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["inventory", "vanilla-js", "static-site"],
+  "license": "MIT"
+}

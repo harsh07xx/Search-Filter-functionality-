@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BINSTOCK — Component Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="description" content="BINSTOCK — search and filter a live component inventory by zone, stock level, and price.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!--
+    BINSTOCK — component inventory search & filter console.
+    Structure:
+      1. topbar    — brand mark + live result-count readout
+      2. console   — search field, sort control, zone filters, recent-search
+                     chips, result trace, the bin grid, and the empty-state /
+                     legend fallbacks
+      3. statusbar — a persistent footer status line
+    All data, filtering, and sorting logic lives in the inline <script> below; this
+    file defines the shell and the containers that script renders into.
+  -->
+
+  <div class="scanline" aria-hidden="true"></div>
+
+  <!-- 1. Topbar: brand mark and the live "results in view" readout -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">◧</span>
+        <div class="brand-text">
+          <span class="brand-name">BINSTOCK</span>
+          <span class="brand-sub">Component Inventory</span>
+        </div>
+      </div>
+
+      <div class="readout" id="readout">
+        <span class="readout-value" id="resultCount">00</span>
+        <span class="readout-label">in stock view</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Console: everything the shopper interacts with lives inside main -->
+  <main class="console">
+
+    <p class="console-intro">
+      This console mirrors the physical bin layout of the warehouse floor. Search by part
+      name or SKU, narrow to a zone, and sort by whatever matters right now — price, name,
+      or units on the shelf. Every card below reflects the live count in that bin.
+    </p>
+
+    <!-- Search field (debounced in JS) + result sort order -->
+    <section class="control-deck">
+      <div class="search-bay">
+        <span class="search-glyph">⌕</span>
+        <input
+          id="searchInput"
+          type="text"
+          class="search-field"
+          placeholder="Search by part name or SKU…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <!-- Swaps between a keyboard hint and a "clear" button; the inline script owns the toggle -->
+        <div class="search-side" id="searchSide">
+          <span class="kbd-hint" id="kbdHint"><kbd>/</kbd> focus</span>
+        </div>
+      </div>
+
+      <div class="sort-bay">
+        <label class="sort-label" for="sortSelect">Order</label>
+        <select id="sortSelect" class="sort-field">
+          <option value="relevance">Relevance</option>
+          <option value="price-asc">Price ↑</option>
+          <option value="price-desc">Price ↓</option>
+          <option value="name-asc">Name A–Z</option>
+          <option value="stock-desc">Stock ↓</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Zone pills: one per warehouse zone, plus "All"; populated from INVENTORY -->
+    <nav class="zone-row" id="zoneRow" aria-label="Filter by bin category"></nav>
+
+    <!-- Session-scoped recent-search chips, read from sessionStorage -->
+    <div class="recent-row" id="recentRow" aria-label="Recent searches this session"></div>
+
+    <!-- Plain-language breadcrumb of the active zone / query / sort -->
+    <div class="trace" id="trace" aria-live="polite"></div>
+
+    <!-- The result set itself, one .bin-card per matching item -->
+    <section class="bin-grid" id="binGrid" aria-live="polite"></section>
+
+    <!-- Shown instead of .bin-grid whenever a search returns zero results -->
+    <section class="empty-state" id="emptyState" hidden>
+      <div class="empty-glyph">▨</div>
+      <p class="empty-title" id="emptyTitle">No bins match that query</p>
+      <p class="empty-hint">Try a shorter keyword, or clear the active filters.</p>
+      <button class="empty-reset" id="emptyReset" type="button">Clear filters</button>
+    </section>
+
+    <!-- Collapsed by default: a quick reference for zone colors, shortcuts, and stock states -->
+    <details class="legend">
+      <summary>Zone legend &amp; shortcuts</summary>
+      <div class="legend-body">
+        <div class="legend-col">
+          <h3>Zone colors</h3>
+          <ul id="legendZones" class="legend-list"></ul>
+        </div>
+        <div class="legend-col">
+          <h3>Keyboard</h3>
+          <ul class="legend-list">
+            <li><kbd>/</kbd> jump to search</li>
+            <li><kbd>Esc</kbd> clear search</li>
+          </ul>
+        </div>
+        <div class="legend-col">
+          <h3>Stock status</h3>
+          <ul class="legend-list">
+            <li><span class="bin-status in-stock">In stock</span> &gt; 5 units</li>
+            <li><span class="bin-status low-stock">Low stock</span> &le; 5 units</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </main>
+
+  <!-- 3. Statusbar: a persistent, low-emphasis status line updated on every render -->
+  <footer class="statusbar">
+    <span id="statusText">Ready</span>
+    <span class="statusbar-dot" aria-hidden="true"></span>
+    <span id="statusTime"></span>
+  </footer>
+
+  <noscript>
+    <p style="max-width:640px;margin:40px auto;text-align:center;font-family:sans-serif;color:#8592B0;">
+      BINSTOCK needs JavaScript enabled to search and filter the live inventory.
+    </p>
+  </noscript>
+
+  <script src="script.js"></script>
+</body>
+</html>
